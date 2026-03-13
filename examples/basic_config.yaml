@@ -1,0 +1,37 @@
+# ncountr basic configuration example
+# Uses synthetic RCC files included in examples/sample_rcc/
+
+input:
+  rcc_dirs:
+    - examples/sample_rcc
+  file_pattern: '*.RCC'
+  sample_id_pattern: '(\d+)'
+
+output:
+  directory: ./example_results
+  figure_format: png
+  figure_dpi: 200
+
+samples:
+  metadata:
+    '1': { group: treated }
+    '2': { group: treated }
+    '3': { group: control }
+  group_column: group
+  comparison: [treated, control]
+  exclude: []
+  negative_control_samples: []
+
+qc:
+  fov_ratio_threshold: 0.75
+  positive_control_r2_threshold: 0.95
+
+normalization:
+  method: pos_hk
+
+de:
+  test: mannwhitneyu
+  correction: fdr_bh
+
+gene_sets:
+  IFN_JAKSTAT: builtin

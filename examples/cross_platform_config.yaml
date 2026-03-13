@@ -1,0 +1,48 @@
+# ncountr cross-platform validation configuration example
+# Compares Nanostring data with external expression data (e.g., scRNA-seq).
+
+input:
+  rcc_dirs:
+    - /path/to/RCC/files
+  file_pattern: '*.RCC'
+  sample_id_pattern: '(\d+)'
+
+output:
+  directory: ./cross_platform_results
+  figure_format: png
+  figure_dpi: 200
+
+samples:
+  metadata:
+    'S1': { group: treated, type: HuHu }
+    'S2': { group: treated, type: HuHu }
+    'S3': { group: control, type: HuHu }
+  group_column: group
+  comparison: [treated, control]
+  exclude: []
+  negative_control_samples: ['NSG1']
+
+qc:
+  fov_ratio_threshold: 0.75
+  positive_control_r2_threshold: 0.95
+
+normalization:
+  method: pos_hk
+
+de:
+  test: mannwhitneyu
+  correction: fdr_bh
+
+gene_sets:
+  IFN_JAKSTAT: builtin
+
+cross_platform:
+  enabled: true
+  external_data:
+    path: /path/to/adata.h5ad
+    format: h5ad
+    pseudobulk_group_by: Sample
+  sample_mapping:
+    'S1': 'S1'
+    'S2': 'S2'
+    'S3': 'S3'
