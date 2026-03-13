@@ -8,8 +8,40 @@ from typing import Union
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import stats as sp_stats
 
 from ncountr.experiment import NanostringExperiment
+
+
+def _pos_scale_hk(experiment: NanostringExperiment) -> np.ndarray:
+    """Compute pos-normalized HK totals for each sample."""
+    samples = experiment.samples
+    pos_df = experiment.pos_counts
+    hk_df = experiment.hk_counts
+
+    # Compute positive control geometric-mean scaling factors
+    geomeans = {}
+    for sid in samples:
+        vals = pos_df[sid].values.astype(float)
+        vals = vals[vals > 0]
+        geomeans[sid] = sp_stats.gmean(vals) if len(vals) > 0 else np.nan
+
+    valid = [v for v in geomeans.values() if np.isfinite(v)]
+    if not valid:
+        return hk_df[samples].sum(axis=0).values.astype(float)
+
+    grand = sp_stats.gmean(valid)
+    pos_scale = {
+        sid: grand / geomeans[sid] if np.isfinite(geomeans[sid]) else 1.0
+        for sid in samples
+    }
+
+    # Apply pos scaling to HK counts and sum
+    hk_pos_norm = np.array([
+        (hk_df[sid].values.astype(float) * pos_scale[sid]).sum()
+        for sid in samples
+    ])
+    return hk_pos_norm
 
 
 def plot_qc(
@@ -21,7 +53,7 @@ def plot_qc(
     """Generate a 4-panel QC summary figure.
 
     Panels: A) FOV ratio, B) Positive control linearity,
-    C) Negative background, D) Housekeeping gene totals.
+    C) Negative background, D) Housekeeping gene totals (raw + pos-normalized).
 
     Parameters
     ----------
@@ -90,11 +122,24 @@ def plot_qc(
     ax.set_ylabel("Background (mean + 2*SD)")
     ax.set_title("C. Negative Control Background")
 
-    # D: Housekeeping gene totals
+    # D: Housekeeping gene totals (raw + pos-normalized)
     ax = axes[1, 1]
-    hk_totals = hk_df[samples].sum(axis=0)
-    ax.bar(range(len(samples)), hk_totals.values, color="steelblue")
-    ax.set_xticks(range(len(samples)))
+    hk_totals_raw = hk_df[samples].sum(axis=0).values.astype(float)
+    x = np.arange(len(samples))
+    bar_width = 0.35
+
+    has_pos = len(pos_df) > 0 and pos_df.shape[0] > 0
+    if has_pos:
+        hk_totals_norm = _pos_scale_hk(experiment)
+        ax.bar(x - bar_width / 2, hk_totals_raw, bar_width,
+               color="lightsteelblue", label="Raw")
+        ax.bar(x + bar_width / 2, hk_totals_norm, bar_width,
+               color="steelblue", label="Pos-normalized")
+        ax.legend(fontsize=8)
+    else:
+        ax.bar(x, hk_totals_raw, color="steelblue")
+
+    ax.set_xticks(x)
     ax.set_xticklabels(samples, rotation=45, ha="right")
     ax.set_ylabel("Total HK Gene Counts")
     ax.set_title("D. Housekeeping Gene Totals")

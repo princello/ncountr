@@ -107,7 +107,33 @@ def run(config_path: str, output_dir: str | None):
             click.echo(f"  {group_a_name} ({len(group_a)}) vs {group_b_name} ({len(group_b)})")
             click.echo(f"  Significant (padj < 0.05): {n_sig}")
 
-            fig = plot_volcano(de_results, output=outdir / f"volcano.{cfg.figure_format}")
+            # Resolve highlight genes
+            hl_genes = None
+            hl_label = cfg.highlight_label
+            if cfg.highlight_genes:
+                if isinstance(cfg.highlight_genes, str):
+                    # Treat as builtin gene set name
+                    from ncountr.datasets import get_gene_set
+                    try:
+                        hl_genes = get_gene_set(cfg.highlight_genes)
+                        if hl_label == "Highlighted":
+                            hl_label = cfg.highlight_genes.replace("_", "/")
+                        click.echo(f"  Highlighting: {hl_label} ({len(hl_genes)} genes)")
+                    except KeyError:
+                        click.echo(f"  Warning: gene set '{cfg.highlight_genes}' not found, skipping highlight")
+                elif isinstance(cfg.highlight_genes, list):
+                    hl_genes = cfg.highlight_genes
+                    click.echo(f"  Highlighting: {hl_label} ({len(hl_genes)} genes)")
+
+            fig = plot_volcano(
+                de_results,
+                highlight_genes=hl_genes,
+                highlight_label=hl_label,
+                highlight_color=cfg.highlight_color,
+                output=outdir / f"volcano.{cfg.figure_format}",
+                title=f"Nanostring DE: {group_a_name} vs {group_b_name}\n"
+                      f"({len(group_a)} {group_a_name.lower()}, {len(group_b)} {group_b_name.lower()})",
+            )
             plt.close(fig)
             click.echo(f"  Saved: volcano.{cfg.figure_format}")
         else:

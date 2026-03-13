@@ -41,6 +41,11 @@ class NcountrConfig:
     de_test: str = "mannwhitneyu"
     de_correction: str = "fdr_bh"
 
+    # Volcano plot
+    highlight_genes: list[str] | str | None = None  # gene list, or builtin set name
+    highlight_label: str = "Highlighted"
+    highlight_color: str = "gold"
+
     # Gene sets
     gene_sets: dict[str, Any] = field(default_factory=dict)
 
@@ -118,6 +123,15 @@ def load_config(path: Union[str, Path]) -> NcountrConfig:
     if "correction" in de:
         cfg.de_correction = de["correction"]
 
+    # Volcano plot options
+    volcano = raw.get("volcano", {})
+    if "highlight_genes" in volcano:
+        cfg.highlight_genes = volcano["highlight_genes"]
+    if "highlight_label" in volcano:
+        cfg.highlight_label = volcano["highlight_label"]
+    if "highlight_color" in volcano:
+        cfg.highlight_color = volcano["highlight_color"]
+
     # Gene sets
     if "gene_sets" in raw:
         cfg.gene_sets = dict(raw["gene_sets"])
@@ -170,6 +184,17 @@ normalization:
 de:
   test: mannwhitneyu    # mannwhitneyu | ttest
   correction: fdr_bh
+
+# Volcano plot options (optional)
+# volcano:
+#   highlight_genes: IFN_JAKSTAT   # builtin gene set name, or list of genes
+#   highlight_label: IFN/JAK-STAT genes
+#   highlight_color: gold
+#   # Custom gene list example:
+#   # highlight_genes:
+#   #   - STAT1
+#   #   - STAT2
+#   #   - IRF1
 
 gene_sets:
   IFN_JAKSTAT: builtin
