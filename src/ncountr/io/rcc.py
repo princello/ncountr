@@ -65,6 +65,7 @@ def read_rcc(
     file_pattern: str = "*.RCC",
     sample_id_pattern: str = r"(\d+)",
     sample_id_field: str = "ID",
+    sample_id_from: str = "field",
     sample_meta: dict[str, dict] | None = None,
 ) -> NanostringExperiment:
     """Read RCC files from one or more directories into a NanostringExperiment.
@@ -76,10 +77,16 @@ def read_rcc(
     file_pattern : str
         Glob pattern to match RCC files within each directory.
     sample_id_pattern : str
-        Regex applied to the sample ID field to extract a clean sample ID.
+        Regex applied to extract a clean sample ID.
         The first capture group is used.
     sample_id_field : str
         Which field in the ``<Sample_Attributes>`` section holds the sample ID.
+        Only used when ``sample_id_from="field"``.
+    sample_id_from : str
+        Where to extract the sample ID from.  ``"field"`` (default) uses the
+        ``sample_id_field`` from the RCC file.  ``"filename"`` applies the
+        regex to the filename instead — useful when internal IDs are
+        inconsistent across files.
     sample_meta : dict[str, dict] | None
         Optional per-sample metadata, keyed by sample ID.
 
@@ -106,7 +113,10 @@ def read_rcc(
 
     for fp in rcc_files:
         parsed = parse_rcc(fp)
-        raw_id = parsed["sample"].get(sample_id_field, "")
+        if sample_id_from == "filename":
+            raw_id = fp.stem  # filename without extension
+        else:
+            raw_id = parsed["sample"].get(sample_id_field, "")
         match = re.search(sample_id_pattern, raw_id)
         if not match:
             continue
@@ -133,7 +143,7 @@ def read_rcc(
     negative = sorted({name for cls, name in all_keys if cls == "Negative"})
     housekeeping = sorted({name for cls, name in all_keys if cls == "Housekeeping"})
 
-    samples = sorted(all_data, key=lambda x: int(x) if x.isdigit() else x)
+    samples = sorted(all_data, key=lambda x: (0, int(x)) if x.isdigit() else (1, x))
 
     def _build_df(genes: list[str], code_class: str) -> pd.DataFrame:
         return pd.DataFrame(

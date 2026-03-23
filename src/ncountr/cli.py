@@ -202,6 +202,18 @@ def qc_cmd(counts: str, output: str):
     click.echo(f"  {exp.n_genes} genes x {exp.n_samples} samples")
 
 
+@cli.command(name="fetch-geo")
+@click.argument("accession")
+@click.option("--output-dir", "-o", default=".", help="Parent directory for downloaded files.")
+def fetch_geo_cmd(accession: str, output_dir: str):
+    """Download RCC files from GEO (e.g. ncountr fetch-geo GSE275334)."""
+    from ncountr.io.geo import fetch_geo
+
+    rcc_dir = fetch_geo(accession, output_dir=output_dir)
+    n_files = len(list(rcc_dir.glob("*.RCC")))
+    click.echo(f"Downloaded {n_files} RCC files → {rcc_dir}")
+
+
 @cli.command()
 @click.option("--counts", "-c", required=True, type=click.Path(exists=True),
               help="Normalized count CSV (genes x samples).")

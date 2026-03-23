@@ -12,3 +12,6 @@ htmlcov/
 *.png
 *.pdf
 example_results/
+examples/vignettes/data/
+docs/_build/
+.DS_Store
