@@ -1,6 +1,14 @@
 # ncountr
 
+[![CI](https://github.com/princello/ncountr/actions/workflows/ci.yml/badge.svg)](https://github.com/princello/ncountr/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/ncountr)](https://pypi.org/project/ncountr/)
+[![conda-forge](https://img.shields.io/conda/vn/conda-forge/ncountr)](https://anaconda.org/conda-forge/ncountr)
+[![Docs](https://readthedocs.org/projects/ncountr/badge/?version=latest)](https://ncountr.readthedocs.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A Python pipeline for analyzing Nanostring nCounter gene expression data — from raw instrument files to differential expression, pathway scoring, and publication-ready figures.
+
+**11 R packages exist for nCounter data, but until now there was no Python option.** ncountr fills that gap.
 
 ## The problem ncountr solves
 
@@ -24,6 +32,26 @@ pip install ncountr[crossplatform]
 ```
 
 Requires Python 3.9+.
+
+## What's new
+
+- **`to_anndata()` export** — convert nCounter data to AnnData for scanpy/scverse integration
+- **`ncountr fetch-geo GSE275334`** — download RCC files directly from NCBI GEO
+- **`sample_id_from="filename"`** — extract sample IDs from filenames when internal RCC IDs are inconsistent
+- **[Documentation](https://ncountr.readthedocs.io)** — Sphinx docs with API reference and CLI docs
+- **5 validated vignettes** — reproduced published results from GEO datasets (see below)
+
+## Validated on real-world data
+
+ncountr has been tested against 5 published nCounter datasets totaling 1,458 samples:
+
+| Dataset | Panel | Samples | Key result |
+|---------|-------|---------|------------|
+| [GSE275334](examples/vignettes/GSE275334_long_covid.ipynb) | Immune Exhaustion (773 genes) | 47 | Long COVID / ME/CFS 3-group design |
+| [GSE140901](examples/vignettes/GSE140901_hcc_immunotherapy.ipynb) | PanCancer Immune (730 genes) | 24 | ICI responder vs non-responder |
+| [GSE117751](examples/vignettes/GSE117751_autoimmune_retinopathy.ipynb) | Human Immunology (579 genes) | 42 | AIR vs RP vs Control (also in NanoTube tutorials) |
+| [GSE268012](examples/vignettes/GSE268012_ifn_macrophages.ipynb) | Human Metabolism (748 genes) | 24 | IFN factorial: 232 DE genes for IFNβ |
+| [GSE74821](examples/vignettes/GSE74821_breast_cancer_pam50.ipynb) | PAM50 Custom (50 genes) | 1,321 | **Stress test**: 1,321 samples parsed in 3s |
 
 ## Typical workflow
 
@@ -175,6 +203,31 @@ plot_volcano(
 # Pathway scores by group
 plot_pathway_scores(scores, output="ifn_scores.png")
 ```
+
+## Download data from GEO
+
+```bash
+ncountr fetch-geo GSE275334 -o data/
+```
+
+Or from Python:
+
+```python
+from ncountr.io.geo import fetch_geo
+rcc_dir = fetch_geo("GSE275334", output_dir="data/")
+```
+
+## Export to AnnData (scverse integration)
+
+```python
+adata = ncountr.to_anndata(experiment)
+# adata.X = normalized counts (samples x genes)
+# adata.layers["raw"] = raw counts
+# adata.obs = sample metadata + QC results + lane info
+# adata.var["housekeeping"] = housekeeping gene flag
+```
+
+This enables seamless downstream analysis with scanpy, squidpy, decoupler, and other scverse tools.
 
 ## Cross-platform validation
 
