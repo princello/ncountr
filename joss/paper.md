@@ -13,7 +13,7 @@ authors:
     orcid: 0000-0001-6128-296X
     affiliation: 1
 affiliations:
-  - name: Department of Biomedical Informatics, Columbia University Irving Medical Center, New York, NY, USA
+  - name: Columbia Center for Translational Immunology, Department of Medicine, Columbia University Irving Medical Center, New York, NY, USA
     index: 1
 date: 24 March 2026
 bibliography: paper.bib
