@@ -65,7 +65,7 @@ nCounter instruments write one `.RCC` file per sample. ncountr reads a directory
 ncountr parse --rcc-dir /path/to/RCC/ --id-pattern '(\d+)'
 ```
 
-The `--id-pattern` regex extracts sample IDs from filenames (e.g., `Sample_668_Lung.RCC` becomes sample `668`).
+The `--id-pattern` regex extracts sample IDs from filenames (e.g., `Sample_01_Lung.RCC` becomes sample `01`).
 
 ### 2. Quality control
 
@@ -134,12 +134,12 @@ output:
 
 samples:
   metadata:
-    '668': { group: infected }
-    '678': { group: infected }
-    '587': { group: control }
-    '3601': { group: control }
+    'S1': { group: treated }
+    'S2': { group: treated }
+    'S3': { group: control }
+    'S4': { group: control }
   group_column: group
-  comparison: [infected, control]
+  comparison: [treated, control]
 
 normalization:
   method: pos_hk
@@ -152,7 +152,7 @@ gene_sets:
   IFN_JAKSTAT: builtin
 ```
 
-This will parse your RCC files, run QC, normalize, test for differential expression between infected and control, score each sample for IFN/JAK-STAT pathway activity, and save all results and figures to `./results/`.
+This will parse your RCC files, run QC, normalize, test for differential expression between treated and control, score each sample for IFN/JAK-STAT pathway activity, and save all results and figures to `./results/`.
 
 ## Python API
 
@@ -171,8 +171,8 @@ ncountr.normalize(experiment, method="pos_hk")
 # Differential expression
 de_results = ncountr.de(
     experiment,
-    group_a=["668", "678", "680"],
-    group_b=["587", "3601", "3603"],
+    group_a=["S1", "S2", "S3"],
+    group_b=["S4", "S5", "S6"],
 )
 
 # Gene set scoring
@@ -243,8 +243,8 @@ cross_platform:
     format: h5ad
     pseudobulk_group_by: Sample   # aggregate single cells by sample
   sample_mapping:
-    '668': '668'                  # nCounter ID → external ID
-    '678': '678'
+    'S1': 'S1'                    # nCounter ID → external ID
+    'S2': 'S2'
   negative_control_samples: ['697']  # non-target species controls
 ```
 
