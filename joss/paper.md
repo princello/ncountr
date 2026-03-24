@@ -10,7 +10,7 @@ tags:
   - differential expression
 authors:
   - name: Zicheng Wang
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0001-6128-296X
     affiliation: 1
 affiliations:
   - name: Department of Biomedical Informatics, Columbia University Irving Medical Center, New York, NY, USA
