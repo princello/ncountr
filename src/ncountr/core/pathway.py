@@ -63,6 +63,16 @@ def score_gene_set(
         row_std = mat.std(axis=1).replace(0, np.nan)
         z = mat.subtract(row_mean, axis=0).div(row_std, axis=0)
         scores = z.mean(axis=0)
+    elif method == "ssgsea":
+        from ncountr.core.gsea import _running_enrichment_score
+        scores_dict = {}
+        for sample in samples:
+            sample_ranks = mat[sample].rank(ascending=False)
+            es, _, _ = _running_enrichment_score(
+                sample_ranks, available, weighted_score_type=0.25
+            )
+            scores_dict[sample] = es
+        scores = pd.Series(scores_dict)
     else:
         raise ValueError(f"Unknown scoring method: {method!r}")
 

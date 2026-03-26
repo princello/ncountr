@@ -100,7 +100,7 @@ def plot_volcano(
                 ax.annotate(
                     row["gene"],
                     (row["log2FC"], -np.log10(max(row["pvalue"], 1e-10))),
-                    fontsize=7, alpha=0.9, color="darkgoldenrod",
+                    fontsize=8, alpha=0.9, color="darkgoldenrod",
                     fontweight="bold",
                 )
 
@@ -113,7 +113,7 @@ def plot_volcano(
             ax.annotate(
                 row["gene"],
                 (row["log2FC"], -np.log10(max(row["pvalue"], 1e-10))),
-                fontsize=7, alpha=0.8,
+                fontsize=8, alpha=0.8,
             )
 
     ax.axhline(-np.log10(0.05), color="grey", linestyle="--", alpha=0.5,
@@ -126,7 +126,7 @@ def plot_volcano(
     else:
         n_sig = is_sig.sum()
         ax.set_title(f"Volcano plot ({n_sig} significant at padj < {padj_threshold})")
-    ax.legend(fontsize=9)
+    ax.legend(fontsize=10)
 
     plt.tight_layout()
     if output is not None:

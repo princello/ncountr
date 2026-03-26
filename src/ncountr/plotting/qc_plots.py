@@ -88,7 +88,7 @@ def plot_qc(
     ax.set_xticklabels(samples, rotation=45, ha="right")
     ax.set_ylabel("FOV Counted / FOV Count")
     ax.set_title("A. Field of View Ratio")
-    ax.legend(fontsize=8)
+    ax.legend(fontsize=10)
 
     # B: Positive control linearity
     ax = axes[0, 1]
@@ -107,7 +107,7 @@ def plot_qc(
     ax.set_xlabel("log10(Expected Concentration)")
     ax.set_ylabel("log10(Observed Count)")
     ax.set_title("B. Positive Control Linearity")
-    ax.legend(fontsize=6, ncol=3, loc="lower right")
+    ax.legend(fontsize=8, ncol=3, loc="lower right")
 
     # C: Negative control background
     ax = axes[1, 0]
@@ -135,7 +135,7 @@ def plot_qc(
                color="lightsteelblue", label="Raw")
         ax.bar(x + bar_width / 2, hk_totals_norm, bar_width,
                color="steelblue", label="Pos-normalized")
-        ax.legend(fontsize=8)
+        ax.legend(fontsize=10)
     else:
         ax.bar(x, hk_totals_raw, color="steelblue")
 

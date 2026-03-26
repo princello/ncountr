@@ -19,7 +19,7 @@ def plot_heatmap(
     cmap: str = "RdBu_r",
     title: str = "",
     xlabel_rotation: int = 45,
-    ylabel_fontsize: int = 8,
+    ylabel_fontsize: int = 10,
     output: Union[str, Path, None] = None,
     figsize: tuple[float, float] | None = None,
 ) -> plt.Figure:
@@ -59,7 +59,7 @@ def plot_heatmap(
 
     ax.set_xticks(range(n_samples))
     ax.set_xticklabels(data.columns, rotation=xlabel_rotation, ha="right",
-                        fontsize=max(6, 10 - n_samples // 5))
+                        fontsize=max(8, 10 - n_samples // 5))
     ax.set_yticks(range(n_genes))
     ax.set_yticklabels(data.index, fontsize=ylabel_fontsize)
 

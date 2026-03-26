@@ -45,6 +45,7 @@ class NanostringExperiment:
     normalized: Optional[pd.DataFrame] = None
     qc_results: Optional[pd.DataFrame] = None
     de_results: Optional[pd.DataFrame] = None
+    gsea_results: Optional[pd.DataFrame] = None
 
     @property
     def samples(self) -> list[str]:

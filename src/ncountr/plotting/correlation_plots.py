@@ -50,7 +50,7 @@ def plot_correlation_scatter(
         ax.scatter(x[highlight_idx], y[highlight_idx], s=25, c="red", zorder=5)
         if labels is not None:
             for i in highlight_idx:
-                ax.annotate(labels[i], (x[i], y[i]), fontsize=6, alpha=0.7)
+                ax.annotate(labels[i], (x[i], y[i]), fontsize=8, alpha=0.7)
 
     r, p = stats.spearmanr(x, y)
     if title is None:

@@ -48,14 +48,22 @@ def get_gene_set(name: str) -> list[str]:
     for k, v in _GENE_SETS.items():
         if k.upper() == key:
             return list(v)
+    # Fall through to Hallmark gene sets
+    from ncountr.genesets import get_hallmark_set
+    try:
+        return get_hallmark_set(name)
+    except KeyError:
+        pass
     raise KeyError(
-        f"Unknown gene set {name!r}. Available: {list(_GENE_SETS.keys())}"
+        f"Unknown gene set {name!r}. Available: {list(_GENE_SETS.keys())}. "
+        f"Use ncountr.genesets.list_hallmark_sets() for Hallmark sets."
     )
 
 
 def list_gene_sets() -> list[str]:
-    """Return names of all built-in gene sets."""
-    return list(_GENE_SETS.keys())
+    """Return names of all built-in gene sets (custom + Hallmark)."""
+    from ncountr.genesets import list_hallmark_sets
+    return list(_GENE_SETS.keys()) + list_hallmark_sets()
 
 
 def get_cell_markers(cell_type: str | None = None) -> dict[str, list[str]] | list[str]:
