@@ -49,7 +49,12 @@ def plot_pathway_scores(
     group_names = list(groups.keys())
     group_scores = [scores.reindex(groups[g]).dropna().values for g in group_names]
 
-    bp = ax.boxplot(group_scores, labels=group_names, widths=0.5, patch_artist=True)
+    # Set tick labels explicitly rather than via boxplot(labels=...): that
+    # keyword was renamed to tick_labels in matplotlib 3.9 and removed in 3.11,
+    # whereas set_xticklabels works across all supported matplotlib versions.
+    bp = ax.boxplot(group_scores, widths=0.5, patch_artist=True)
+    ax.set_xticks(range(1, len(group_names) + 1))
+    ax.set_xticklabels(group_names)
     for i, name in enumerate(group_names):
         color = group_colors.get(name, "#888888")
         bp["boxes"][i].set_facecolor(color)

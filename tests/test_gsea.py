@@ -68,7 +68,9 @@ class TestRunningEnrichmentScore:
         exp, ga, gb = ifn_experiment
         ranked = rank_genes(exp.raw_counts, ga, gb)
         es, running, le = _running_enrichment_score(ranked, IFN_SET)
-        assert -1.0 <= es <= 1.0
+        # ES is conceptually in [-1, 1]; allow float rounding (perfect
+        # enrichment can yield 1.0 + a few ulps depending on the BLAS).
+        assert -1.0 - 1e-9 <= es <= 1.0 + 1e-9
         assert len(running) == exp.n_genes
 
     def test_positive_es_for_top_ranked_set(self, ifn_experiment):
