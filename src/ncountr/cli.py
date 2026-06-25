@@ -214,7 +214,7 @@ def fetch_geo_cmd(accession: str, output_dir: str):
     click.echo(f"Downloaded {n_files} RCC files → {rcc_dir}")
 
 
-@cli.command()
+@cli.command(name="de")
 @click.option("--counts", "-c", required=True, type=click.Path(exists=True),
               help="Normalized count CSV (genes x samples).")
 @click.option("--groups", "-g", required=True, multiple=True,
