@@ -441,11 +441,14 @@ def gsea_preranked(
             "leading_edge": "|".join(le),
         })
 
+    if not results:
+        return pd.DataFrame(
+            columns=["gene_set", "es", "nes", "pvalue", "padj",
+                     "n_genes", "n_overlap", "leading_edge"]
+        )
+
     df = pd.DataFrame(results)
-    if len(df) > 0:
-        _, df["padj"], _, _ = multipletests(df["pvalue"], method=correction)
-    else:
-        df["padj"] = []
+    _, df["padj"], _, _ = multipletests(df["pvalue"], method=correction)
     return df.sort_values("pvalue").reset_index(drop=True)
 
 
@@ -530,11 +533,13 @@ def competitive_test(
             "n_overlap": len(overlap),
         })
 
+    if not results:
+        return pd.DataFrame(
+            columns=["gene_set", "direction", "stat", "pvalue", "padj", "n_overlap"]
+        )
+
     df = pd.DataFrame(results)
-    if len(df) > 0:
-        _, df["padj"], _, _ = multipletests(df["pvalue"], method=correction)
-    else:
-        df["padj"] = []
+    _, df["padj"], _, _ = multipletests(df["pvalue"], method=correction)
     return df.sort_values("pvalue").reset_index(drop=True)
 
 
@@ -637,9 +642,11 @@ def self_contained_test(
             "n_overlap": len(overlap),
         })
 
+    if not results:
+        return pd.DataFrame(
+            columns=["gene_set", "mean_diff", "pvalue", "padj", "n_overlap"]
+        )
+
     df = pd.DataFrame(results)
-    if len(df) > 0:
-        _, df["padj"], _, _ = multipletests(df["pvalue"], method=correction)
-    else:
-        df["padj"] = []
+    _, df["padj"], _, _ = multipletests(df["pvalue"], method=correction)
     return df.sort_values("pvalue").reset_index(drop=True)

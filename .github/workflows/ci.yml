@@ -24,7 +24,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          # crossplatform extra (anndata/scanpy) so the optional-dependency
+          # tests (to_anndata, crossplatform, h5ad loaders) actually run in CI
+          pip install -e ".[dev,crossplatform]"
 
       - name: Run tests
         run: pytest tests/ -v --tb=short

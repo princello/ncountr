@@ -1,6 +1,13 @@
 """ncountr — Python pipeline for Nanostring nCounter data analysis."""
 
-__version__ = "0.2.0"
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
+
+try:
+    # Single source of truth: the version declared in pyproject.toml,
+    # surfaced through the installed package metadata.
+    __version__ = _pkg_version("ncountr")
+except PackageNotFoundError:  # pragma: no cover - package not installed
+    __version__ = "0.0.0+unknown"
 
 from ncountr.experiment import NanostringExperiment
 from ncountr.io.rcc import read_rcc, parse_rcc

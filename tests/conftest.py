@@ -216,6 +216,64 @@ def experiment_with_meta(rcc_dir: Path) -> NanostringExperiment:
     return read_rcc(rcc_dir, sample_meta=meta)
 
 
+def _make_ifn_experiment(
+    *, n_per_group: int = 3, fold: float = 8.0, seed: int = 7
+) -> tuple[NanostringExperiment, list[str], list[str]]:
+    """Build an experiment where IFN/JAK-STAT genes are up in group A.
+
+    Uses real gene symbols so that built-in gene sets (IFN_JAKSTAT, which
+    overlaps MX1/IFIT1/ISG15/OAS1/STAT1/CXCL10) have enough measured genes
+    to pass the GSEA overlap filter.  Returns ``(experiment, group_a, group_b)``.
+    """
+    rng = np.random.default_rng(seed)
+
+    ifn_genes = ["MX1", "IFIT1", "ISG15", "OAS1", "STAT1", "CXCL10"]
+    other_genes = ["TNF", "IL6", "CD3D", "CD4", "GAPDH_X", "ACTB_X"]
+    genes = ifn_genes + other_genes
+
+    group_a = [f"A{i}" for i in range(1, n_per_group + 1)]
+    group_b = [f"B{i}" for i in range(1, n_per_group + 1)]
+    samples = group_a + group_b
+
+    data = {}
+    for s in samples:
+        col = []
+        in_a = s in group_a
+        for g in genes:
+            base = 200.0
+            if g in ifn_genes and in_a:
+                base *= fold
+            col.append(max(rng.normal(base, base * 0.1), 1.0))
+        data[s] = col
+    raw = pd.DataFrame(data, index=genes)
+
+    pos = pd.DataFrame(
+        {s: [25000, 6250, 390] for s in samples},
+        index=["POS_A(128)", "POS_B(32)", "POS_C(2)"],
+    )
+    neg = pd.DataFrame({s: [8, 10] for s in samples}, index=["NEG_A(0)", "NEG_B(0)"])
+    hk = pd.DataFrame({s: [5000, 4800] for s in samples}, index=["ACTB", "GAPDH"])
+    meta = pd.DataFrame(
+        {"group": ["A"] * n_per_group + ["B"] * n_per_group},
+        index=pd.Index(samples, name="sample"),
+    )
+
+    exp = NanostringExperiment(
+        raw_counts=raw,
+        pos_counts=pos,
+        neg_counts=neg,
+        hk_counts=hk,
+        sample_meta=meta,
+    )
+    return exp, group_a, group_b
+
+
+@pytest.fixture()
+def ifn_experiment() -> tuple[NanostringExperiment, list[str], list[str]]:
+    """Experiment with IFN genes up in group A, plus its two sample groups."""
+    return _make_ifn_experiment()
+
+
 @pytest.fixture()
 def simple_experiment() -> NanostringExperiment:
     """Minimal hand-crafted experiment with fully deterministic values.
