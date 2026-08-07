@@ -227,7 +227,31 @@ adata = ncountr.to_anndata(experiment)
 # adata.var["housekeeping"] = housekeeping gene flag
 ```
 
-This enables seamless downstream analysis with scanpy, squidpy, decoupler, and other scverse tools.
+From there the analysis continues in scanpy like any other AnnData:
+
+```python
+import scanpy as sc
+
+# Work on a copy — endogenous genes only, since the housekeeping genes were
+# consumed by pos_hk normalization and carry no independent signal downstream
+adata_sc = adata[:, ~adata.var["housekeeping"]].copy()
+
+sc.pp.log1p(adata_sc)
+sc.pp.scale(adata_sc, max_value=10)
+sc.tl.pca(adata_sc, n_comps=20, svd_solver="arpack")
+sc.pl.pca(adata_sc, color="group")
+```
+
+`.X` already holds positive-control and housekeeping normalized counts, so there is no
+library-size renormalization step here — that scaling is the nCounter-appropriate one and
+re-running an RNA-seq style total-count normalization would discard it.
+
+The [GSE275334 vignette](examples/vignettes/GSE275334_long_covid.ipynb) works through this
+end to end — PCA, principal components coloured by the QC and lane metadata carried across
+in `.obs`, a group dendrogram, `rank_genes_groups` and a matrixplot — including a
+cross-check that re-running the same contrast through `scanpy.tl.rank_genes_groups`
+reproduces the `ncountr.de()` gene ranking (Spearman rho = 0.999998, 19 of the top 20 genes
+shared). The exported object is also ready for decoupler and other scverse tools.
 
 ## Cross-platform validation
 
