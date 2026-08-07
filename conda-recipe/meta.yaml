@@ -1,5 +1,6 @@
 {% set name = "ncountr" %}
-{% set version = "0.1.0" %}
+{% set version = "0.2.0" %}
+{% set python_min = "3.9" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +8,7 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  # sha256 will be filled after first PyPI release
+  sha256: 9062bef1d369081970fc822b5a86b3df1f4557d1aded89ff5eda78720fe1d831
 
 build:
   noarch: python
@@ -18,12 +19,11 @@ build:
 
 requirements:
   host:
-    - python >=3.9
+    - python {{ python_min }}
     - pip
     - setuptools >=64
-    - setuptools-scm >=8
   run:
-    - python >=3.9
+    - python >={{ python_min }}
     - numpy >=1.21
     - pandas >=1.3
     - scipy >=1.7
@@ -38,7 +38,11 @@ test:
     - ncountr.core
     - ncountr.io
     - ncountr.plotting
+  requires:
+    - python {{ python_min }}
+    - pip
   commands:
+    - pip check
     - ncountr --version
     - ncountr --help
 
@@ -46,10 +50,13 @@ about:
   home: https://github.com/princello/ncountr
   summary: Python pipeline for Nanostring nCounter data analysis
   description: |
-    ncountr is the first Python package for end-to-end nCounter data analysis.
-    Parse RCC files, run QC, normalize, test for differential expression, and
-    score gene sets — all from a single config file or Python API.
+    ncountr is a Python package for end-to-end nCounter data analysis.
+    Parse RCC files, run QC, normalize, test for differential expression
+    (Mann-Whitney U or t-test with FDR correction), and score gene sets —
+    all from a single config file or Python API. Results can be exported
+    as AnnData for downstream analysis with scanpy.
   license: MIT
+  license_family: MIT
   license_file: LICENSE
   doc_url: https://ncountr.readthedocs.io
   dev_url: https://github.com/princello/ncountr

@@ -7,6 +7,7 @@ Top-level functions
 .. automodule:: ncountr
    :members:
    :undoc-members:
+   :exclude-members: NanostringExperiment
 
 Data container
 --------------

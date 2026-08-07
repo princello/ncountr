@@ -48,3 +48,8 @@ intersphinx_mapping = {
 # Napoleon settings for NumPy-style docstrings
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
+# Render a docstring "Attributes" section as :ivar: fields rather than separate
+# .. attribute:: directives. NanostringExperiment documents its attributes both
+# in the class docstring and as annotated class attributes, and without this the
+# two render as duplicate object descriptions.
+napoleon_use_ivar = True
